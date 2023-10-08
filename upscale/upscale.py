@@ -27,7 +27,6 @@ def upscale(input_path: str, output_path: str = "lama_600px.png", model_path: st
     cv2.imwrite(output_path, result)
 
 def example():
-    # upscale('upscale/lama_300px.png', os.path.join('results', 'lama_600px.png'))
     input_path = os.path.join("lama_300px.png")
     output_path = os.path.join("../results", "lama_600px.png")
     model_path = os.path.join("EDSR_x2.pb")
