@@ -39,18 +39,6 @@ class UpscaleView(MethodView):
         out_files = request.json["out_files"]
         return in_files, out_files
 
-    # def get_image(self):
-    #     image = request.files.get("files")
-    #     extension = image.filename.split(".")[-1]
-    #     input_path = os.path.join("results", f"lama_300px.{extension}")
-    #     output_path = os.path.join("results", f"lama_600px.{extension}")
-    #     image.save(input_path)
-    #     return input_path, output_path
-
-
-
-
-
 upscale_view = UpscaleView.as_view("upscale")
 processed_view = ProcessedView.as_view("processed")
 app.add_url_rule("/upscale", view_func=upscale_view, methods=["POST"])
