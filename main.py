@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify
 from flask.views import MethodView
 from celery.result import AsyncResult
 
+
 app_name = "app"
 app = Flask(app_name)
 app.config["UPLOAD_FOLDER"] = "results"
@@ -42,7 +43,7 @@ class UpscaleView(MethodView):
         image = request.files.get("file")
         extension = image.filename.split(".")[-1]
         input_path = os.path.join("results", f"lama_300px.{extension}")
-        output_path = os.path.join("results", f"lama_600px.{extension}")
+        output_path = os.path.join(f"lama_600px.{extension}")
         image.save(input_path)
         return input_path, output_path
 

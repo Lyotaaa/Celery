@@ -4,13 +4,13 @@ from celery import Celery
 from cv2 import dnn_superres
 
 
-backend = "redis://127.0.0.1:6379/1"
-broker = "redis://127.0.0.1:6379/2"
+backend = "redis://127.0.0.1:6379/3"
+broker = "redis://127.0.0.1:6379/4"
 
-celery = Celery(backend=backend, broker=broker)
+celery = Celery("app", backend=backend, broker=broker)
 
 
-@celery.task
+@celery.task()
 def upscale(
     input_path: str,
     output_path: str,
