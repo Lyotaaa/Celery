@@ -8,7 +8,7 @@ response = requests.post(
     json={
         # "files": open("upscale/lama_300px.png", "rb"),
         "in_files": os.path.join("upscale", "lama_300px.png"),
-        "out_files": "../results\\lama_600px.png",
+        "out_files": os.path.join("results", "lama_600px.png"),
         # "out_files": os.path.join("../results", "lama_600px.png"),
     },
 ).json()

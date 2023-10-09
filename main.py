@@ -30,7 +30,6 @@ class UpscaleView(MethodView):
         return jsonify(
             {
                 "task_id": task.id,
-                "files": output_path
             }
         )
 
@@ -38,6 +37,22 @@ class UpscaleView(MethodView):
         in_files = request.json["in_files"]
         out_files = request.json["out_files"]
         return in_files, out_files
+
+    # def get_image(self):
+    #     image = request.files.get("files")
+    #     extension = image.filename.split(".")[-1]
+    #     input_path = os.path.join("results", f"lama_300px.{extension}")
+    #     output_path = os.path.join("results", f"lama_600px.{extension}")
+    #     image.save(input_path)
+    #     return input_path, output_path
+
+
+class ProcessedView(MethodView):
+    def get(self, filename):
+        status = None
+        if status == "SUCCESS":
+            return jsonify({"status": status, "path_in_file": os.path.join("files", f"")})
+
 
 upscale_view = UpscaleView.as_view("upscale")
 processed_view = ProcessedView.as_view("processed")
