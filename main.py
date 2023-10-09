@@ -33,18 +33,18 @@ class UpscaleView(MethodView):
             }
         )
 
-    def get_image(self):
-        in_files = request.json["in_files"]
-        out_files = request.json["out_files"]
-        return in_files, out_files
-
     # def get_image(self):
-    #     image = request.files.get("files")
-    #     extension = image.filename.split(".")[-1]
-    #     input_path = os.path.join("results", f"lama_300px.{extension}")
-    #     output_path = os.path.join("results", f"lama_600px.{extension}")
-    #     image.save(input_path)
-    #     return input_path, output_path
+    #     in_files = request.json["in_files"]
+    #     out_files = request.json["out_files"]
+    #     return in_files, out_files
+
+    def get_image(self):
+        image = request.files.get("file")
+        extension = image.filename.split(".")[-1]
+        input_path = os.path.join("results", f"lama_300px.{extension}")
+        output_path = os.path.join("results", f"lama_600px.{extension}")
+        image.save(input_path)
+        return input_path, output_path
 
 
 class ProcessedView(MethodView):
