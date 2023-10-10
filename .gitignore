@@ -1,1 +1,9 @@
+<<<<<<< HEAD
 ver3
+=======
+venv
+.idea
+__pycache__
+__init__.py
+cel
+>>>>>>> 1df17d587181cd993ffbc80ae02587f813c5d5a4
