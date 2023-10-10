@@ -10,7 +10,7 @@ broker = "redis://127.0.0.1:6379/4"
 celery = Celery("app", backend=backend, broker=broker)
 
 
-@celery.task()
+@celery.task
 def upscale(
     input_path: str,
     output_path: str,

@@ -20,32 +20,34 @@ class ContextTask(celery.Task):
 celery.Task = ContextTask
 
 
+
+def get_file_name(file: str):
+    return file[len(app.config['UPLOAD_FOLDER']) + 1:]
+
 class UpscaleView(MethodView):
+    def post(self):
+        orig_file, res_file = self.save_image()
+        task = upscale.delay(orig_file, res_file)
+        return jsonify({
+            'task_id': task.id,
+            #'file_name': get_file_name(res_file)
+        })
+
     def get(self, task_id):
         task = AsyncResult(task_id, app=celery)
-        return jsonify({"status": task.status, "result": task.result})
+        return jsonify({
+            'status': task.status,
+        })
 
-    def post(self):
-        input_path, output_path = self.get_image()
-        task = upscale.delay(input_path, output_path)
-        return jsonify(
-            {
-                "task_id": task.id,
-            }
-        )
 
-    # def get_image(self):
-    #     in_files = request.json["in_files"]
-    #     out_files = request.json["out_files"]
-    #     return in_files, out_files
-
-    def get_image(self):
-        image = request.files.get("file")
-        extension = image.filename.split(".")[-1]
-        input_path = os.path.join("results", f"lama_300px.{extension}")
-        output_path = os.path.join(f"lama_600px.{extension}")
-        image.save(input_path)
-        return input_path, output_path
+    def save_image(self):
+        image = request.files.get('file')
+        extension, name = image.filename.split('.')[-1], image.filename.split('.')[0]
+        orig_file = os.path.join('files', f'{name}.{extension}')
+        res_file = os.path.join('files', f'{name}_upscaled.{extension}')
+        image.save(orig_file)
+        # image.save(res_file)
+        return orig_file, res_file
 
 
 class ProcessedView(MethodView):
@@ -65,3 +67,5 @@ app.add_url_rule(
 
 if __name__ == "__main__":
     app.run()
+
+
