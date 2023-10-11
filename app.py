@@ -7,16 +7,15 @@ from flask.views import MethodView
 from celery.result import AsyncResult
 
 
-"""Парамтры для Flask и Celery"""
 app_name = "app"
 app = Flask(app_name)
 app.config["UPLOAD_PATH"] = "result"
-celery = Celery(
-    "app", backend="redis://127.0.0.1:6379/1", broker="redis://127.0.0.1:6379/2"
-)
+BACKEND = "redis://redis:6379/0"
+BROCKER = "redis://redis:6379/0"
+celery = Celery("app", backend=BACKEND, broker=BROCKER)
 celery.conf.update(app.config)
 
-"""Волшебная функция"""
+
 class ContextTask(celery.Task):
     def __call__(self, *args, **kwargs):
         with app.app_context():
@@ -25,7 +24,7 @@ class ContextTask(celery.Task):
 
 celery.Task = ContextTask
 
-"""Обработка фотографии"""
+
 @celery.task()
 def upscale(input_path: str, output_path: str, model_path: str = "EDSR_x2.pb") -> None:
     """
@@ -49,33 +48,37 @@ def get_file_name(file: str):
 
 class Upscaling(MethodView):
     def post(self):
-        while True:
-            orig_file, res_file = self.save_image()
-            task = upscale.delay(orig_file, res_file)
-            return jsonify({"task_id": task.id, "file_name": get_file_name(res_file)})
+        orig_file, res_file = self.save_image()
+        task = upscale.delay(orig_file, res_file)
+        return jsonify({"task_id": task.id, "file_name": get_file_name(res_file)})
 
     def get(self, task_id):
-        while True:
-            task = AsyncResult(task_id, app=celery)
+        task = AsyncResult(task_id, app=celery)
+        if task.status == "PENDING":
             return jsonify(
                 {
                     "status": task.status,
                 }
             )
-
+        elif task.status == "SUCCESS":
+            return jsonify(
+                {
+                    "status": task.status,
+                    "link": f'http://127.0.0.1:5000/upscaling/{request.json["file_name"]}'
+                }
+            )
     def save_image(self):
         image = request.files.get("files")
         extension, name = image.filename.split(".")[-1], image.filename.split(".")[0]
         orig_file = os.path.join("result", f"{name}.{extension}")
         res_file = os.path.join("result", f"{name}_upscaled.{extension}")
         image.save(orig_file)
-        image.save(res_file)
         return orig_file, res_file
 
 
 class Upscaled(MethodView):
-    def get(self, file):
-        return send_file(path_or_file=os.path.join(app.config["UPLOAD_PATH"], file))
+    def get(self, file_name):
+        return send_file(path_or_file=os.path.join(app.config["UPLOAD_PATH"], file_name))
 
 
 upscaling = Upscaling.as_view("upscaling")

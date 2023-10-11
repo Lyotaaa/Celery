@@ -7,18 +7,24 @@ response = requests.post(
 ).json()
 file_name = response["file_name"]
 task_id = response["task_id"]
-print(file_name, task_id)
+print(task_id)
 print("\nStart get method")
 status = "PENDING"
 while status == "PENDING":
-    response = requests.get(f"http://127.0.0.1:5000/upscaling/{task_id}/")
+    response = requests.get(f"http://127.0.0.1:5000/upscaling/{task_id}/", json={"file_name": file_name})
     response = response.json()
-    print(response)
     status = response["status"]
-    if status == "PENDING":
-        time.sleep(10)
-print(response)
+    if response["status"] == "SUCCESS":
+        print(response)
+        break
+    elif response["status"] == "PENDING":
+        print(response)
+        time.sleep(2.5)
+
 print("\nSecond get method")
 response = requests.get(f"http://127.0.0.1:5000/upscaled/{file_name}/")
 print("Done!")
 print(f"Время загрузки изображения: {datetime.datetime.now() - start}")
+"""
+python client.py
+"""

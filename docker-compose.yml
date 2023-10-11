@@ -1,8 +1,45 @@
 version: '3.9'
 
-services:
+networks:
+  test:
 
+services:
   redis:
     image: redis:7.0.10-alpine3.17
     ports:
       - "6379:6379"
+    networks:
+      test:
+        aliases:
+          - db-redis
+    container_name: redis
+
+  worker:
+    build:
+     context: .
+    restart: on-failure:3
+    env_file:
+     - ./.env
+    entrypoint: celery -A app.celery worker --loglevel=info
+    depends_on:
+     - redis
+    networks:
+     test:
+    volumes:
+     - ./:/app
+    container_name: worker
+
+  app:
+    build:
+     context: .
+    restart: on-failure:3
+    env_file:
+     - ./.env
+    entrypoint: python app.py
+    depends_on:
+     - redis
+    networks:
+     test:
+    volumes:
+     - ./:/app
+    container_name: app
