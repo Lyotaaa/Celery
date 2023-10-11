@@ -11,7 +11,9 @@ print(task_id)
 print("\nStart get method")
 status = "PENDING"
 while status == "PENDING":
-    response = requests.get(f"http://127.0.0.1:5000/upscaling/{task_id}/", json={"file_name": file_name})
+    response = requests.get(
+        f"http://127.0.0.1:5000/upscaling/{task_id}/", json={"file_name": file_name}
+    )
     response = response.json()
     status = response["status"]
     if response["status"] == "SUCCESS":
@@ -25,6 +27,3 @@ print("\nSecond get method")
 response = requests.get(f"http://127.0.0.1:5000/upscaled/{file_name}/")
 print("Done!")
 print(f"Время загрузки изображения: {datetime.datetime.now() - start}")
-"""
-python client.py
-"""

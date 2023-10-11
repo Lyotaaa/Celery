@@ -64,9 +64,10 @@ class Upscaling(MethodView):
             return jsonify(
                 {
                     "status": task.status,
-                    "link": f'http://127.0.0.1:5000/upscaling/{request.json["file_name"]}'
+                    "link": f'http://127.0.0.1:5000/upscaling/{request.json["file_name"]}',
                 }
             )
+
     def save_image(self):
         image = request.files.get("files")
         extension, name = image.filename.split(".")[-1], image.filename.split(".")[0]
@@ -78,7 +79,9 @@ class Upscaling(MethodView):
 
 class Upscaled(MethodView):
     def get(self, file_name):
-        return send_file(path_or_file=os.path.join(app.config["UPLOAD_PATH"], file_name))
+        return send_file(
+            path_or_file=os.path.join(app.config["UPLOAD_PATH"], file_name)
+        )
 
 
 upscaling = Upscaling.as_view("upscaling")
